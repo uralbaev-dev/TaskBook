@@ -1,11 +1,10 @@
 package com.example.taskbook.service.impl;
 
 import com.example.taskbook.entity.Book;
-import com.example.taskbook.entity.CharacterCounts;
+import com.example.taskbook.dto.CharacterCounts;
 import com.example.taskbook.service.BookService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +14,6 @@ import java.util.stream.Collectors;
 
 @Service
 @Log4j2
-@Primary
 @RequiredArgsConstructor
 public class BookServiceImpl implements BookService {
 
@@ -64,8 +62,8 @@ public class BookServiceImpl implements BookService {
     @Override
     public Map<String, List<Book>> getAllBooksGroupedByAuthor() {
         log.info(">> getAllBooksGroupedByAuthor");
-        String sql = "SELECT * FROM books";
 
+        String sql = "SELECT * FROM books";
         List<Book> allBooks = jdbcTemplate.query(
                 sql,
                 (rs, rowNum) -> new Book(
@@ -82,22 +80,34 @@ public class BookServiceImpl implements BookService {
                     .stream()
                     .collect(Collectors.groupingBy(Book::getAuthor));
         }
+
         log.info("<< getAllBooksGroupedBy | Not found");
         return null;
     }
 
     @Override
-    public List<CharacterCounts> getSymbolOccursMostTimes(String character) {
+    public List<CharacterCounts> getCharacterCounts(String character) {
+        log.info(">> getCharacterCounts");
+
         String sql = "SELECT b.author, SUM(LENGTH(title) - LENGTH(REPLACE(LOWER(title),  LOWER(?), ''))) AS counts " +
                 "FROM books b GROUP BY b.author ORDER BY counts DESC LIMIT 10";
-//        String sql = "SELECT author, SUM(LENGTH(title) - LENGTH(REPLACE(LOWER(title), ?, ''))) AS counts " +
-//                "FROM books GROUP BY author ORDER BY counts DESC LIMIT 10";
-        return jdbcTemplate.query(sql,
+        // FEATURE Response result counts > 0
+        // String sql = "SELECT * FROM (SELECT b.author, SUM(LENGTH(title) - LENGTH(REPLACE(LOWER(title),  LOWER(?), ''))) AS counts " +
+        //                "FROM books b GROUP BY b.author) AS subquery WHERE counts > 0 ORDER BY counts DESC LIMIT 10";
+        List<CharacterCounts> characterCounts = jdbcTemplate.query(sql,
                 (rs, rowNum) -> new CharacterCounts(
                         rs.getString("author"),
                         rs.getInt("counts")
                 ),
                 character
         );
+
+        if (!characterCounts.isEmpty()) {
+            log.info("<< getCharacterCounts");
+            return characterCounts;
+        }
+
+        log.info("<< getCharacterCounts | Not found");
+        return null;
     }
 }

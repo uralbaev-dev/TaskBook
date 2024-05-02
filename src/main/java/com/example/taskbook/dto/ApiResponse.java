@@ -1,19 +1,19 @@
-package com.example.taskbook.entity;
+package com.example.taskbook.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ApiResponse<T> {
 
-    public static int SUCCESS = 0;
+    public static int SUCCESS = 200;
     public static int NOT_FOUND = 404;
 
     @Getter
@@ -31,7 +31,23 @@ public class ApiResponse<T> {
         return new ApiResponse<>(SUCCESS, "OK", data);
     }
 
-    public static <T> ApiResponse<T> error(int code, String message) {
+    public static <T> ApiResponse<T> success(int code, String message, T data) {
+        return new ApiResponse<>(code, message, data);
+    }
+
+    public static <T> ApiResponse<T> success(int code, T data) {
+        return new ApiResponse<>(code, null, data);
+    }
+
+    public static <T> ApiResponse<T> success(String message, int code) {
+        return new ApiResponse<>(code, message, null);
+    }
+
+    public static <T> ApiResponse<T> success(String message) {
+        return new ApiResponse<>(SUCCESS, message, null);
+    }
+
+    public static <T> ApiResponse<T> error(String message, int code) {
         return new ApiResponse<>(code, message, null);
     }
 

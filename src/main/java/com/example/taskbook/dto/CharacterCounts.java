@@ -1,8 +1,7 @@
-package com.example.taskbook.entity;
+package com.example.taskbook.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.Setter;
 
 /**
  * @className: CharacterCounts
@@ -13,7 +12,6 @@ import lombok.Setter;
 @Getter
 @AllArgsConstructor
 public class CharacterCounts {
-
     private String author;
     private Integer counts;
 }

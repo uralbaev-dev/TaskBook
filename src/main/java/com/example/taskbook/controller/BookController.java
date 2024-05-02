@@ -1,6 +1,7 @@
 package com.example.taskbook.controller;
 
 
+import com.example.taskbook.dto.BookDto;
 import com.example.taskbook.entity.Book;
 import com.example.taskbook.service.BookService;
 import com.example.taskbook.service.BookServiceV2;
@@ -10,19 +11,22 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/books")
+@RequestMapping(value = "/books")
 public class BookController {
 
     private final BookService bookService;
     private final BookServiceV2 bookServiceV2;
 
+    // -------------------- begin version 1 -------------------- //
     @GetMapping("/sorted")
     public ResponseEntity<?> getAllBooksSorted() {
         return ResponseEntity.ok(bookService.getAllBooksSorted());
     }
 
     @PostMapping
-    public ResponseEntity<?> addBook(@RequestBody Book book) {
+    public ResponseEntity<?> addBook(
+            @RequestBody Book book
+    ) {
         return ResponseEntity.ok(bookService.addBook(book));
     }
 
@@ -31,25 +35,36 @@ public class BookController {
         return ResponseEntity.ok(bookService.getAllBooksGroupedByAuthor());
     }
 
-//    @GetMapping("/authors-with-char")
-//    public List<CharacterCounts> getAuthorsWithChar(@RequestParam char character) {
-//        String sql = "SELECT author, COUNT(*) AS count FROM books WHERE LOWER(title) LIKE ?";
-//        String param = "%" + Character.toLowerCase(character) + "%";
-//        return jdbcTemplate.query(sql, new Object[]{param}, (rs, rowNum) ->
-//                        new CharacterCounts(rs.getString("author"), rs.getInt("count")))
-//                .sorted((a, b) -> Long.compare(b.getCount(), a.getCount()))
-//                .limit(10)
-//                .collect(Collectors.toList());
-//    }
-
     @GetMapping("/character-count")
-    public ResponseEntity<?> getCharacterCount(@RequestParam("character") String character) {
-        return ResponseEntity.ok(bookService.getSymbolOccursMostTimes(character));
+    public ResponseEntity<?> getCharacterCounts(
+            @RequestParam("character") String character
+    ) {
+        return ResponseEntity.ok(bookService.getCharacterCounts(character));
     }
+    // -------------------- end version 1 -------------------- //
 
-    @GetMapping("/sortedV2")
+
+    // -------------------- begin version 2 -------------------- //
+    @GetMapping("/sorted-v2")
     public ResponseEntity<?> getAllBooksV2() {
         return ResponseEntity.ok(bookServiceV2.getAllBooksSorted());
     }
 
+    @PostMapping("/v2")
+    public ResponseEntity<?> addBookV2(@RequestBody BookDto bookDto) {
+        return ResponseEntity.ok(bookServiceV2.addBook(bookDto));
+    }
+
+    @GetMapping("/group-by-author-v2")
+    public ResponseEntity<?> getAllBooksGroupedByAuthorV2() {
+        return ResponseEntity.ok(bookServiceV2.getAllBooksGroupedByAuthor());
+    }
+
+    @GetMapping("/character-count-v2")
+    public ResponseEntity<?> getCharacterCountsV2(
+            @RequestParam("character") String character
+    ) {
+        return ResponseEntity.ok(bookServiceV2.getCharacterCounts(character));
+    }
+    // -------------------- end version 2 -------------------- //
 }

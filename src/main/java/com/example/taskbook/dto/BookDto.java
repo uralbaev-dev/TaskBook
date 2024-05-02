@@ -1,6 +1,7 @@
 package com.example.taskbook.dto;
 
 import com.example.taskbook.entity.Book;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,6 +11,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class BookDto {
     private Long id;
     private String title;
@@ -18,7 +20,6 @@ public class BookDto {
 
     public Book mapToBook() {
         Book book = new Book();
-        book.setId(this.id);
         book.setTitle(this.title);
         book.setAuthor(this.author);
         book.setDescription(this.description);
